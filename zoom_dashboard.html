@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoom Account Monitor</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for timeline */
+        .timeline-scroll::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .timeline-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 4px;
+        }
+        .timeline-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        .timeline-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        
+        /* Pulsing animation for active meetings */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .status-pulse {
+            animation: pulse-ring 2s infinite;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased h-screen flex flex-col overflow-hidden">
+
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-10 flex-shrink-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-sm">
+                            <i class="fa-solid fa-video text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-slate-900 leading-tight">Zoom Monitor</h1>
+                            <p class="text-xs text-slate-500 font-medium">Real-time Account Dashboard</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden md:flex items-center text-sm text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
+                        <i class="fa-regular fa-clock mr-2"></i>
+                        <span id="current-time">Loading time...</span>
+                    </div>
+                    <button class="text-slate-400 hover:text-slate-500 transition-colors">
+                        <i class="fa-solid fa-gear text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto space-y-6">
+            
+            <!-- Header section for cards -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <h2 class="text-lg font-semibold text-slate-800">Live Status Overview</h2>
+                <div class="text-sm bg-blue-50 text-blue-700 px-4 py-2 rounded-lg border border-blue-100 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>Use the toggle buttons below to simulate Zoom Webhook events.</span>
+                </div>
+            </div>
+
+            <!-- Account Cards Grid -->
+            <div id="accounts-container" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <!-- Cards will be injected by JavaScript -->
+            </div>
+
+            <!-- Schedule Section -->
+            <div class="mt-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-slate-800">Today's Schedule (Sync)</h2>
+                    <button onclick="refreshSchedule()" class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> Refresh Sync
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto timeline-scroll">
+                        <div class="min-w-[1000px] p-0">
+                            <!-- Timeline Header -->
+                            <div class="grid grid-cols-6 border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                <div class="p-4 border-r border-slate-200">Date / Account</div>
+                                <div class="p-4 border-r border-slate-200 text-center">Zoom 1</div>
+                                <div class="p-4 border-r border-slate-200 text-center">Zoom 2</div>
+                                <div class="p-4 border-r border-slate-200 text-center">Zoom 3</div>
+                                <div class="p-4 border-r border-slate-200 text-center">Zoom 4</div>
+                                <div class="p-4 text-center">Zoom 5</div>
+                            </div>
+                            
+                            <!-- Timeline Body -->
+                            <div id="schedule-container" class="divide-y divide-slate-100">
+                                <!-- Schedule rows will be injected by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Application State
+        const accounts = [
+            { id: 1, name: "HR Dept", email: "zoom1@kantor.com", status: "AVAILABLE", avatar: "https://ui-avatars.com/api/?name=HR&background=3b82f6&color=fff&rounded=true" },
+            { id: 2, name: "Marketing", email: "zoom2@kantor.com", status: "IN_MEETING", avatar: "https://ui-avatars.com/api/?name=MK&background=8b5cf6&color=fff&rounded=true" },
+            { id: 3, name: "Engineering", email: "zoom3@kantor.com", status: "AVAILABLE", avatar: "https://ui-avatars.com/api/?name=EN&background=10b981&color=fff&rounded=true" },
+            { id: 4, name: "Sales Team", email: "zoom4@kantor.com", status: "AVAILABLE", avatar: "https://ui-avatars.com/api/?name=SA&background=f59e0b&color=fff&rounded=true" },
+            { id: 5, name: "Executives", email: "zoom5@kantor.com", status: "IN_MEETING", avatar: "https://ui-avatars.com/api/?name=EX&background=ef4444&color=fff&rounded=true" }
+        ];
+
+        // Mock Schedule Data mapped by dates
+        const timeSlots = ["02 Oct 2026", "03 Oct 2026", "04 Oct 2026", "05 Oct 2026", "06 Oct 2026", "07 Oct 2026"];
+        
+        const scheduleData = {
+            "02 Oct 2026": { 1: "Onboarding Baru", 2: null, 3: "Standup Frontend", 4: "Client Pitch", 5: null },
+            "03 Oct 2026": { 1: "Interview", 2: "Campaign Sync", 3: "Backend Sync", 4: null, 5: "Board Meeting" },
+            "04 Oct 2026": { 1: null, 2: "Design Review", 3: null, 4: "Follow up Leads", 5: "Board Meeting" },
+            "05 Oct 2026": { 1: "Training", 2: null, 3: "Sprint Planning", 4: null, 5: null },
+            "06 Oct 2026": { 1: null, 2: "Weekly Report", 3: "Sprint Planning", 4: "Demo Product", 5: "Investor Call" },
+            "07 Oct 2026": { 1: "Evaluasi", 2: null, 3: null, 4: null, 5: null },
+        };
+
+        // Update Current Time
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('current-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Render Account Cards
+        function renderAccounts() {
+            const container = document.getElementById('accounts-container');
+            container.innerHTML = '';
+
+            accounts.forEach(acc => {
+                const isAvailable = acc.status === "AVAILABLE";
+                
+                // Status styles
+                const statusColor = isAvailable ? "text-emerald-600 bg-emerald-50 border-emerald-200" : "text-rose-600 bg-rose-50 border-rose-200";
+                const dotClass = isAvailable ? "bg-emerald-500" : "bg-rose-500 status-pulse";
+                const statusText = isAvailable ? "Available" : "In Meeting";
+                
+                // Button styles for simulation
+                const btnClass = isAvailable 
+                    ? "bg-rose-50 text-rose-600 hover:bg-rose-100 border-rose-200" 
+                    : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-emerald-200";
+                const btnIcon = isAvailable ? "fa-video" : "fa-video-slash";
+                const btnText = isAvailable ? "Simulate Start" : "Simulate End";
+
+                const cardHTML = `
+                    <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 flex flex-col transition-all duration-300 hover:shadow-md relative overflow-hidden">
+                        ${!isAvailable ? '<div class="absolute top-0 left-0 w-full h-1 bg-rose-500"></div>' : '<div class="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>'}
+                        
+                        <div class="flex items-start justify-between mb-4">
+                            <img src="${acc.avatar}" alt="${acc.name}" class="w-12 h-12 rounded-full border-2 border-white shadow-sm">
+                            <div class="px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 border ${statusColor}">
+                                <span class="w-2 h-2 rounded-full ${dotClass}"></span>
+                                ${statusText}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h3 class="text-md font-bold text-slate-800">${acc.name}</h3>
+                            <p class="text-xs text-slate-500 truncate" title="${acc.email}">${acc.email}</p>
+                        </div>
+                        
+                        <div class="mt-auto pt-4 border-t border-slate-100">
+                            <button onclick="toggleStatus(${acc.id})" class="w-full py-2 rounded-lg text-sm font-semibold border flex justify-center items-center gap-2 transition-colors ${btnClass}">
+                                <i class="fa-solid ${btnIcon}"></i> ${btnText}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        // Render Schedule Table
+        function renderSchedule() {
+            const container = document.getElementById('schedule-container');
+            container.innerHTML = '';
+
+            timeSlots.forEach(time => {
+                let rowHTML = `<div class="grid grid-cols-6 hover:bg-slate-50 transition-colors">`;
+                
+                // Time column
+                rowHTML += `
+                    <div class="p-4 border-r border-slate-200 flex items-center justify-center bg-slate-50">
+                        <span class="text-sm font-medium text-slate-600">${time}</span>
+                    </div>
+                `;
+
+                // Accounts columns
+                for (let i = 1; i <= 5; i++) {
+                    const meeting = scheduleData[time][i];
+                    if (meeting) {
+                        rowHTML += `
+                            <div class="p-3 border-r border-slate-200">
+                                <div class="bg-blue-50 border border-blue-100 text-blue-700 text-xs font-semibold p-2 rounded-lg h-full flex flex-col justify-center shadow-sm">
+                                    <span class="block truncate w-full" title="${meeting}">${meeting}</span>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        rowHTML += `
+                            <div class="p-3 border-r border-slate-200 flex items-center justify-center">
+                                <span class="text-slate-300 text-sm">—</span>
+                            </div>
+                        `;
+                    }
+                }
+
+                rowHTML += `</div>`;
+                container.innerHTML += rowHTML;
+            });
+        }
+
+        // Toggle Account Status (Simulating Webhook)
+        function toggleStatus(accountId) {
+            const accountIndex = accounts.findIndex(acc => acc.id === accountId);
+            if (accountIndex !== -1) {
+                // Toggle status
+                accounts[accountIndex].status = accounts[accountIndex].status === "AVAILABLE" ? "IN_MEETING" : "AVAILABLE";
+                
+                // Show a brief simulation toast/log (optional visual cue)
+                const action = accounts[accountIndex].status === "IN_MEETING" ? "meeting.started" : "meeting.ended";
+                console.log(`[Webhook Simulation] Received: ${action} for ${accounts[accountIndex].email}`);
+                
+                // Re-render
+                renderAccounts();
+            }
+        }
+
+        // Simulate Schedule Refresh
+        function refreshSchedule() {
+            const btn = document.querySelector('button[onclick="refreshSchedule()"] i');
+            btn.classList.add('fa-spin');
+            
+            setTimeout(() => {
+                renderSchedule(); // Re-render to simulate fetching data
+                btn.classList.remove('fa-spin');
+            }, 800);
+        }
+
+        // Initial Render
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAccounts();
+            renderSchedule();
+        });
+    </script>
+</body>
+</html>
