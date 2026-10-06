@@ -1,298 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zoom Account Monitor</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            900: '#1e3a8a',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <style>
-        body {
-            background-color: #f3f4f6;
-            font-family: 'Inter', sans-serif;
-        }
-        /* Custom scrollbar for timeline */
-        .timeline-scroll::-webkit-scrollbar {
-            height: 6px;
-            width: 6px;
-        }
-        .timeline-scroll::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-            border-radius: 4px;
-        }
-        .timeline-scroll::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 4px;
-        }
-        .timeline-scroll::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
-        }
-        
-        /* Pulsing animation for active meetings */
-        @keyframes pulse-ring {
-            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
-            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-        }
-        .status-pulse {
-            animation: pulse-ring 2s infinite;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Montoro - Zoom Account Monitor</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script>
+tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{brand:{50:'#eff6ff',100:'#dbeafe',500:'#3b82f6',600:'#2563eb',900:'#1e3a8a'}}}}};
+</script>
+<style>
+body{background:#f3f4f6;font-family:Inter,sans-serif}.timeline-scroll::-webkit-scrollbar{height:6px;width:6px}.timeline-scroll::-webkit-scrollbar-track{background:#f1f1f1;border-radius:4px}.timeline-scroll::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}@keyframes pulse-ring{0%{transform:scale(.8);box-shadow:0 0 0 0 rgba(239,68,68,.7)}70%{transform:scale(1);box-shadow:0 0 0 6px rgba(239,68,68,0)}100%{transform:scale(.8);box-shadow:0 0 0 0 rgba(239,68,68,0)}}.status-pulse{animation:pulse-ring 2s infinite}.toast{animation:toast .25s ease-out}@keyframes toast{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
 </head>
-<body class="text-slate-800 antialiased h-screen flex flex-col overflow-hidden">
-
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-10 flex-shrink-0">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center gap-3">
-                        <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-sm">
-                            <i class="fa-solid fa-video text-lg"></i>
-                        </div>
-                        <div>
-                            <h1 class="text-xl font-bold text-slate-900 leading-tight">Zoom Monitor</h1>
-                            <p class="text-xs text-slate-500 font-medium">Real-time Account Dashboard</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="hidden md:flex items-center text-sm text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
-                        <i class="fa-regular fa-clock mr-2"></i>
-                        <span id="current-time">Loading time...</span>
-                    </div>
-                    <button class="text-slate-400 hover:text-slate-500 transition-colors">
-                        <i class="fa-solid fa-gear text-xl"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <main class="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
-        <div class="max-w-7xl mx-auto space-y-6">
-            
-            <!-- Header section for cards -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <h2 class="text-lg font-semibold text-slate-800">Live Status Overview</h2>
-                <div class="text-sm bg-blue-50 text-blue-700 px-4 py-2 rounded-lg border border-blue-100 flex items-center gap-2">
-                    <i class="fa-solid fa-circle-info"></i>
-                    <span>Use the toggle buttons below to simulate Zoom Webhook events.</span>
-                </div>
-            </div>
-
-            <!-- Account Cards Grid -->
-            <div id="accounts-container" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                <!-- Cards will be injected by JavaScript -->
-            </div>
-
-            <!-- Schedule Section -->
-            <div class="mt-8">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-slate-800">Today's Schedule (Sync)</h2>
-                    <button onclick="refreshSchedule()" class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2">
-                        <i class="fa-solid fa-rotate-right"></i> Refresh Sync
-                    </button>
-                </div>
-                
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="overflow-x-auto timeline-scroll">
-                        <div class="min-w-[1000px] p-0">
-                            <!-- Timeline Header -->
-                            <div class="grid grid-cols-6 border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                <div class="p-4 border-r border-slate-200">Date / Account</div>
-                                <div class="p-4 border-r border-slate-200 text-center">Zoom 1</div>
-                                <div class="p-4 border-r border-slate-200 text-center">Zoom 2</div>
-                                <div class="p-4 border-r border-slate-200 text-center">Zoom 3</div>
-                                <div class="p-4 border-r border-slate-200 text-center">Zoom 4</div>
-                                <div class="p-4 text-center">Zoom 5</div>
-                            </div>
-                            
-                            <!-- Timeline Body -->
-                            <div id="schedule-container" class="divide-y divide-slate-100">
-                                <!-- Schedule rows will be injected by JavaScript -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-    <script>
-        // Application State
-        const accounts = [
-            { id: 1, name: "HR Dept", email: "zoom1@kantor.com", status: "AVAILABLE", avatar: "https://ui-avatars.com/api/?name=HR&background=3b82f6&color=fff&rounded=true" },
-            { id: 2, name: "Marketing", email: "zoom2@kantor.com", status: "IN_MEETING", avatar: "https://ui-avatars.com/api/?name=MK&background=8b5cf6&color=fff&rounded=true" },
-            { id: 3, name: "Engineering", email: "zoom3@kantor.com", status: "AVAILABLE", avatar: "https://ui-avatars.com/api/?name=EN&background=10b981&color=fff&rounded=true" },
-            { id: 4, name: "Sales Team", email: "zoom4@kantor.com", status: "AVAILABLE", avatar: "https://ui-avatars.com/api/?name=SA&background=f59e0b&color=fff&rounded=true" },
-            { id: 5, name: "Executives", email: "zoom5@kantor.com", status: "IN_MEETING", avatar: "https://ui-avatars.com/api/?name=EX&background=ef4444&color=fff&rounded=true" }
-        ];
-
-        // Mock Schedule Data mapped by dates
-        const timeSlots = ["02 Oct 2026", "03 Oct 2026", "04 Oct 2026", "05 Oct 2026", "06 Oct 2026", "07 Oct 2026"];
-        
-        const scheduleData = {
-            "02 Oct 2026": { 1: "Onboarding Baru", 2: null, 3: "Standup Frontend", 4: "Client Pitch", 5: null },
-            "03 Oct 2026": { 1: "Interview", 2: "Campaign Sync", 3: "Backend Sync", 4: null, 5: "Board Meeting" },
-            "04 Oct 2026": { 1: null, 2: "Design Review", 3: null, 4: "Follow up Leads", 5: "Board Meeting" },
-            "05 Oct 2026": { 1: "Training", 2: null, 3: "Sprint Planning", 4: null, 5: null },
-            "06 Oct 2026": { 1: null, 2: "Weekly Report", 3: "Sprint Planning", 4: "Demo Product", 5: "Investor Call" },
-            "07 Oct 2026": { 1: "Evaluasi", 2: null, 3: null, 4: null, 5: null },
-        };
-
-        // Update Current Time
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('current-time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // Render Account Cards
-        function renderAccounts() {
-            const container = document.getElementById('accounts-container');
-            container.innerHTML = '';
-
-            accounts.forEach(acc => {
-                const isAvailable = acc.status === "AVAILABLE";
-                
-                // Status styles
-                const statusColor = isAvailable ? "text-emerald-600 bg-emerald-50 border-emerald-200" : "text-rose-600 bg-rose-50 border-rose-200";
-                const dotClass = isAvailable ? "bg-emerald-500" : "bg-rose-500 status-pulse";
-                const statusText = isAvailable ? "Available" : "In Meeting";
-                
-                // Button styles for simulation
-                const btnClass = isAvailable 
-                    ? "bg-rose-50 text-rose-600 hover:bg-rose-100 border-rose-200" 
-                    : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-emerald-200";
-                const btnIcon = isAvailable ? "fa-video" : "fa-video-slash";
-                const btnText = isAvailable ? "Simulate Start" : "Simulate End";
-
-                const cardHTML = `
-                    <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 flex flex-col transition-all duration-300 hover:shadow-md relative overflow-hidden">
-                        ${!isAvailable ? '<div class="absolute top-0 left-0 w-full h-1 bg-rose-500"></div>' : '<div class="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>'}
-                        
-                        <div class="flex items-start justify-between mb-4">
-                            <img src="${acc.avatar}" alt="${acc.name}" class="w-12 h-12 rounded-full border-2 border-white shadow-sm">
-                            <div class="px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 border ${statusColor}">
-                                <span class="w-2 h-2 rounded-full ${dotClass}"></span>
-                                ${statusText}
-                            </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <h3 class="text-md font-bold text-slate-800">${acc.name}</h3>
-                            <p class="text-xs text-slate-500 truncate" title="${acc.email}">${acc.email}</p>
-                        </div>
-                        
-                        <div class="mt-auto pt-4 border-t border-slate-100">
-                            <button onclick="toggleStatus(${acc.id})" class="w-full py-2 rounded-lg text-sm font-semibold border flex justify-center items-center gap-2 transition-colors ${btnClass}">
-                                <i class="fa-solid ${btnIcon}"></i> ${btnText}
-                            </button>
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += cardHTML;
-            });
-        }
-
-        // Render Schedule Table
-        function renderSchedule() {
-            const container = document.getElementById('schedule-container');
-            container.innerHTML = '';
-
-            timeSlots.forEach(time => {
-                let rowHTML = `<div class="grid grid-cols-6 hover:bg-slate-50 transition-colors">`;
-                
-                // Time column
-                rowHTML += `
-                    <div class="p-4 border-r border-slate-200 flex items-center justify-center bg-slate-50">
-                        <span class="text-sm font-medium text-slate-600">${time}</span>
-                    </div>
-                `;
-
-                // Accounts columns
-                for (let i = 1; i <= 5; i++) {
-                    const meeting = scheduleData[time][i];
-                    if (meeting) {
-                        rowHTML += `
-                            <div class="p-3 border-r border-slate-200">
-                                <div class="bg-blue-50 border border-blue-100 text-blue-700 text-xs font-semibold p-2 rounded-lg h-full flex flex-col justify-center shadow-sm">
-                                    <span class="block truncate w-full" title="${meeting}">${meeting}</span>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        rowHTML += `
-                            <div class="p-3 border-r border-slate-200 flex items-center justify-center">
-                                <span class="text-slate-300 text-sm">—</span>
-                            </div>
-                        `;
-                    }
-                }
-
-                rowHTML += `</div>`;
-                container.innerHTML += rowHTML;
-            });
-        }
-
-        // Toggle Account Status (Simulating Webhook)
-        function toggleStatus(accountId) {
-            const accountIndex = accounts.findIndex(acc => acc.id === accountId);
-            if (accountIndex !== -1) {
-                // Toggle status
-                accounts[accountIndex].status = accounts[accountIndex].status === "AVAILABLE" ? "IN_MEETING" : "AVAILABLE";
-                
-                // Show a brief simulation toast/log (optional visual cue)
-                const action = accounts[accountIndex].status === "IN_MEETING" ? "meeting.started" : "meeting.ended";
-                console.log(`[Webhook Simulation] Received: ${action} for ${accounts[accountIndex].email}`);
-                
-                // Re-render
-                renderAccounts();
-            }
-        }
-
-        // Simulate Schedule Refresh
-        function refreshSchedule() {
-            const btn = document.querySelector('button[onclick="refreshSchedule()"] i');
-            btn.classList.add('fa-spin');
-            
-            setTimeout(() => {
-                renderSchedule(); // Re-render to simulate fetching data
-                btn.classList.remove('fa-spin');
-            }, 800);
-        }
-
-        // Initial Render
-        document.addEventListener('DOMContentLoaded', () => {
-            renderAccounts();
-            renderSchedule();
-        });
-    </script>
-</body>
-</html>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+<nav class="bg-white border-b border-slate-200 sticky top-0 z-10 flex-shrink-0">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><div class="flex justify-between h-16">
+<div class="flex items-center"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-sm"><i class="fa-solid fa-video text-lg"></i></div><div><h1 class="text-xl font-bold text-slate-900 leading-tight">Montoro</h1><p class="text-xs text-slate-500 font-medium">Zoom Account Monitor</p></div></div></div>
+<div class="flex items-center gap-3"><div class="hidden md:flex items-center text-sm text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full"><i class="fa-regular fa-clock mr-2"></i><span id="current-time">--:--:--</span></div><div id="connection-badge" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-500"><i class="fa-solid fa-circle-notch fa-spin mr-1"></i>Menghubungkan...</div><button onclick="loadDashboard()" title="Refresh dashboard" class="text-slate-400 hover:text-blue-600 transition-colors"><i id="top-refresh" class="fa-solid fa-rotate-right text-lg"></i></button></div>
+</div></div></nav>
+<main class="flex-1 overflow-auto p-4 sm:p-6 lg:p-8"><div class="max-w-7xl mx-auto space-y-6">
+<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"><div><h2 class="text-lg font-semibold">Live Status Overview</h2><p id="last-sync" class="text-xs text-slate-500 mt-1">Belum ada sinkronisasi.</p></div><div id="notice" class="text-sm bg-blue-50 text-blue-700 px-4 py-2 rounded-lg border border-blue-100 flex items-center gap-2"><i class="fa-solid fa-circle-info"></i><span>Data diambil langsung dari Zoom API melalui backend Vercel.</span></div></div>
+<div id="summary-cards" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm"><p class="text-xs text-slate-500">Zoom Users</p><p id="stat-users" class="text-2xl font-bold mt-1">-</p></div>
+<div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm"><p class="text-xs text-slate-500">Meeting Terjadwal</p><p id="stat-meetings" class="text-2xl font-bold mt-1">-</p></div>
+<div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm"><p class="text-xs text-slate-500">Meeting Minutes (bulan)</p><p id="stat-minutes" class="text-2xl font-bold mt-1">-</p></div>
+<div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm"><p class="text-xs text-slate-500">Participants (bulan)</p><p id="stat-participants" class="text-2xl font-bold mt-1">-</p></div>
+</div>
+<div id="accounts-container" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4"></div>
+<div class="mt-8"><div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"><div><h2 class="text-lg font-semibold">Today's Schedule (Zoom Sync)</h2><p class="text-xs text-slate-500">Menampilkan jadwal meeting yang dikembalikan Zoom untuk user aktif.</p></div><button onclick="refreshSchedule()" class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2"><i id="schedule-refresh" class="fa-solid fa-rotate-right"></i> Refresh Sync</button></div>
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"><div class="overflow-x-auto timeline-scroll"><div class="min-w-[1000px]"><div class="grid grid-cols-6 border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider"><div class="p-4 border-r border-slate-200">Tanggal</div><div class="p-4 border-r border-slate-200 text-center">Zoom 1</div><div class="p-4 border-r border-slate-200 text-center">Zoom 2</div><div class="p-4 border-r border-slate-200 text-center">Zoom 3</div><div class="p-4 border-r border-slate-200 text-center">Zoom 4</div><div class="p-4 text-center">Zoom 5+</div></div><div id="schedule-container" class="divide-y divide-slate-100"></div></div></div></div></div>
+<div class="mt-8"><div class="flex items-center justify-between mb-4"><div><h2 class="text-lg font-semibold">Zoom Usage</h2><p id="usage-period" class="text-xs text-slate-500">Laporan harian bulan berjalan.</p></div></div><div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-xs uppercase text-slate-500"><tr><th class="text-left p-3">Tanggal</th><th class="text-right p-3">Meeting</th><th class="text-right p-3">Minutes</th><th class="text-right p-3">Participants</th><th class="text-right p-3">New Users</th></tr></thead><tbody id="usage-container" class="divide-y divide-slate-100"></tbody></table></div></div></div>
+</div></main>
+<div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2"></div>
+<script>
+const state={users:[],meetings:[],usage:null};
+const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const fmtNumber=n=>new Intl.NumberFormat('id-ID').format(Number(n||0));
+const fmtTime=d=>new Intl.DateTimeFormat('id-ID',{hour:'2-digit',minute:'2-digit'}).format(new Date(d));
+const fmtDate=d=>new Intl.DateTimeFormat('id-ID',{day:'2-digit',month:'short',year:'numeric'}).format(new Date(d));
+function updateClock(){document.getElementById('current-time').textContent=new Intl.DateTimeFormat('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(new Date())}setInterval(updateClock,1000);updateClock();
+function toast(message,type='info'){const el=document.createElement('div');el.className='toast bg-white border shadow-lg rounded-lg px-4 py-3 text-sm flex items-center gap-2 '+(type==='error'?'border-rose-200 text-rose-700':'border-slate-200 text-slate-700');el.innerHTML='<i class="fa-solid '+(type==='error'?'fa-circle-exclamation':'fa-circle-info')+'"></i>'+esc(message);document.getElementById('toast-container').appendChild(el);setTimeout(()=>el.remove(),4000)}
+async function api(path){const r=await fetch(path,{headers:{Accept:'application/json'}});const data=await r.json().catch(()=>({}));if(!r.ok||data.ok===false)throw new Error(data.error||`Request gagal (${r.status})`);return data;}
+function setConnection(ok,text){const b=document.getElementById('connection-badge');b.className='px-3 py-1.5 rounded-full text-xs font-semibold '+(ok?'bg-emerald-50 text-emerald-700':'bg-rose-50 text-rose-700');b.innerHTML='<i class="fa-solid '+(ok?'fa-circle-check':'fa-circle-xmark')+' mr-1"></i>'+text}
+function renderAccounts(){const c=document.getElementById('accounts-container');if(!state.users.length){c.innerHTML='<div class="col-span-full bg-white rounded-xl border border-slate-200 p-6 text-center text-slate-500">Tidak ada user Zoom aktif yang dikembalikan API.</div>';return}c.innerHTML=state.users.map((u,i)=>{const meetings=state.meetings.filter(m=>m.hostId===u.id);const now=Date.now();const active=meetings.some(m=>{const start=new Date(m.startTime).getTime(),end=start+m.duration*60000;return now>=start&&now<end});const avatar=u.picUrl||`https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=2563eb&color=fff&rounded=true`;return `<div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 flex flex-col relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1 ${active?'bg-rose-500':'bg-emerald-500'}"></div><div class="flex items-start justify-between mb-4"><img src="${esc(avatar)}" class="w-12 h-12 rounded-full border-2 border-white shadow-sm" alt="${esc(u.name)}"><div class="px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 border ${active?'text-rose-600 bg-rose-50 border-rose-200':'text-emerald-600 bg-emerald-50 border-emerald-200'}"><span class="w-2 h-2 rounded-full ${active?'bg-rose-500 status-pulse':'bg-emerald-500'}"></span>${active?'Scheduled Meeting':'Available'}</div></div><div><h3 class="text-md font-bold text-slate-800">${esc(u.name)}</h3><p class="text-xs text-slate-500 truncate" title="${esc(u.email)}">${esc(u.email)}</p></div><div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-500"><i class="fa-solid fa-calendar-days mr-1"></i>${meetings.length} meeting dalam rentang sinkronisasi</div></div>`}).join('')}
+function renderSchedule(){const c=document.getElementById('schedule-container');const groups={};state.meetings.forEach(m=>{const key=fmtDate(m.startTime);(groups[key]??=[]).push(m)});const dates=Object.keys(groups).sort((a,b)=>new Date(a)-new Date(b));if(!dates.length){c.innerHTML='<div class="p-8 text-center text-slate-400">Tidak ada meeting terjadwal dalam rentang yang diambil.</div>';return}const columns=Math.min(Math.max(state.users.length,5),5);c.innerHTML=dates.map(date=>{const ms=groups[date];let cells='';for(let i=0;i<columns;i++){const u=state.users[i];const m=ms.find(x=>x.hostId===u?.id);cells+=`<div class="p-3 border-r border-slate-200 min-h-[80px]">${m?`<div class="bg-blue-50 border border-blue-100 text-blue-700 text-xs font-semibold p-2 rounded-lg"><div class="truncate" title="${esc(m.topic)}">${esc(m.topic)}</div><div class="font-normal text-blue-500 mt-1">${fmtTime(m.startTime)} · ${m.duration}m</div><div class="font-normal text-slate-500 mt-1 truncate">${esc(u.name)}</div>${m.joinUrl?`<a class="inline-block mt-2 text-blue-700 underline" href="${esc(m.joinUrl)}" target="_blank" rel="noopener">Join</a>`:''}</div>`:'<div class="h-full flex items-center justify-center text-slate-300">—</div>'}</div>`}return `<div class="grid grid-cols-6 hover:bg-slate-50"><div class="p-4 border-r border-slate-200 flex items-center justify-center bg-slate-50"><span class="text-sm font-medium text-slate-600">${esc(date)}</span></div>${cells}</div>`}).join('')}
+function renderUsage(){const c=document.getElementById('usage-container');const u=state.usage;if(!u){c.innerHTML='<tr><td colspan="5" class="p-6 text-center text-slate-400">Data usage belum tersedia.</td></tr>';return}document.getElementById('stat-minutes').textContent=fmtNumber(u.totals.meetingMinutes);document.getElementById('stat-participants').textContent=fmtNumber(u.totals.participants);document.getElementById('usage-period').textContent=`Laporan ${u.month}/${u.year}`;const rows=[...u.dates].sort((a,b)=>a.date.localeCompare(b.date));c.innerHTML=rows.length?rows.map(x=>`<tr><td class="p-3">${esc(fmtDate(x.date))}</td><td class="p-3 text-right">${fmtNumber(x.meetings)}</td><td class="p-3 text-right">${fmtNumber(x.meeting_minutes)}</td><td class="p-3 text-right">${fmtNumber(x.participants)}</td><td class="p-3 text-right">${fmtNumber(x.new_users)}</td></tr>`).join(''):'<tr><td colspan="5" class="p-6 text-center text-slate-400">Tidak ada data harian.</td></tr>'}
+async function loadDashboard(){document.getElementById('top-refresh').classList.add('fa-spin');try{const today=new Date();const from=today.toISOString().slice(0,10);const to=new Date(today.getTime()+7*86400000).toISOString().slice(0,10);const [users,meetings,usage,health]=await Promise.all([api('/api/zoom/users'),api(`/api/zoom/meetings?from=${from}&to=${to}`),api(`/api/zoom/usage?month=${today.getMonth()+1}&year=${today.getFullYear()}`),api('/api/zoom/health')]);state.users=users.users||[];state.meetings=meetings.meetings||[];state.usage=usage;document.getElementById('stat-users').textContent=fmtNumber(users.total);document.getElementById('stat-meetings').textContent=fmtNumber(state.meetings.length);renderAccounts();renderSchedule();renderUsage();setConnection(health.connected,'Zoom Connected');document.getElementById('last-sync').textContent='Terakhir sinkron: '+new Date().toLocaleString('id-ID');if(meetings.warnings?.length)toast(`${meetings.warnings.length} user tidak dapat diambil jadwalnya.`,'error')}catch(e){setConnection(false,'Zoom Error');toast(e.message,'error');document.getElementById('notice').innerHTML='<i class="fa-solid fa-triangle-exclamation"></i><span>Periksa Environment Variables dan scope aplikasi Zoom.</span>'}finally{document.getElementById('top-refresh').classList.remove('fa-spin')}}
+async function refreshSchedule(){const i=document.getElementById('schedule-refresh');i.classList.add('fa-spin');try{const today=new Date();const from=today.toISOString().slice(0,10);const to=new Date(today.getTime()+7*86400000).toISOString().slice(0,10);const data=await api(`/api/zoom/meetings?from=${from}&to=${to}`);state.meetings=data.meetings||[];document.getElementById('stat-meetings').textContent=fmtNumber(state.meetings.length);renderAccounts();renderSchedule();document.getElementById('last-sync').textContent='Schedule disinkron: '+new Date().toLocaleString('id-ID');toast('Schedule Zoom berhasil disinkronkan.')}catch(e){toast(e.message,'error')}finally{i.classList.remove('fa-spin')}}
+document.addEventListener('DOMContentLoaded',loadDashboard);
+</script>
+</body></html>
