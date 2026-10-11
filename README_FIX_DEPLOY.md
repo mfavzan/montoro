@@ -2,7 +2,7 @@
 
 Perbaikan ini menghapus konfigurasi `runtime: nodejs20.x` dari `vercel.json`. Runtime Node.js untuk file JavaScript di folder `/api` sudah dideteksi otomatis oleh Vercel; runtime seperti `nodejs20.x` tidak perlu dicantumkan sebagai community runtime.
 
-`package.json` menambahkan `"type": "module"` agar `export default` di file API dikenali sebagai ES modules.
+`package.json` tidak menetapkan `"type": "module"` karena file API menggunakan CommonJS (`require` dan `module.exports`).
 
 Langkah:
 1. Ekstrak ZIP ini.
